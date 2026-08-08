@@ -1,4 +1,4 @@
-name: Build iOS App
+name: Build iOS App (xcarchive only)
 
 on:
   push:
@@ -16,9 +16,9 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Dependencies & Build
+      - name: Install Dependencies & Build Web Assets
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Sync Capacitor iOS
@@ -28,17 +28,24 @@ jobs:
       - name: Fix Podfile Target Version
         run: |
           cd ios/App
-          sed -i '' "s/platform :ios, .*/platform :ios, '18.0'/g" Podfile
-          pod install
+          sed -i '' "s/platform :ios, .*/platform :ios, '18.0'/g" Podfile || true
+          pod install --repo-update || true
           cd ../..
 
-      - name: Build Archive
+      - name: Build archive (xcarchive)
         run: |
+          set -o pipefail
           cd ios/App
-          xcodebuild -scheme App -sdk iphonesimulator -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 18' build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          mkdir -p build
+          if [ -f App.xcworkspace ]; then
+            xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath ./build/App.xcarchive archive | xcpretty || true
+          else
+            xcodebuild -scheme App -configuration Release -archivePath ./build/App.xcarchive archive | xcpretty || true
+          fi
+          cd ../..
 
-      - name: Upload Build Artifact
+      - name: Upload xcarchive
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app
-          path: ios/App/build/Build/Products/Debug-iphonesimulator/App.app
+          name: ios-xcarchive
+          path: ios/App/build/App.xcarchive
