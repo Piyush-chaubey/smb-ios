@@ -38,8 +38,15 @@ jobs:
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath "$PWD/build/App.xcarchive" archive
           cd ../..
 
-      - name: Upload xcarchive
+      - name: Zip xcarchive
+        run: |
+          cd ios/App/build
+          # create a single zip file containing the .xcarchive
+          /usr/bin/zip -r App.xcarchive.zip App.xcarchive
+          cd ../..
+
+      - name: Upload xcarchive zip
         uses: actions/upload-artifact@v4
         with:
-          name: ios-xcarchive
-          path: ios/App/build/App.xcarchive
+          name: ios-xcarchive-zip
+          path: ios/App/build/App.xcarchive.zip
