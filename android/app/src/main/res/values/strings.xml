@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Shri Madhusudhan Bapuji</string>
+    <string name="title_activity_main">Shri Madhusudhan Bapuji</string>
+    <string name="package_name">shri.madhusudan.bapuji</string>
+    <string name="custom_url_scheme">shri.madhusudan.bapuji</string>
+</resources>

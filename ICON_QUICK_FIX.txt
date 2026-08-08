@@ -1,0 +1,88 @@
+========================================
+ANDROID APP ICON - QUICK FIX
+========================================
+
+PROBLEM:
+--------
+Favicon.png is for WEB BROWSERS only.
+Android needs LAUNCHER ICONS in multiple sizes.
+
+SOLUTION:
+---------
+
+STEP 1: Generate Icons
+-----------------------
+✓ Open: generate-android-icons.html (should be open now)
+✓ Upload: public/favicon.png
+✓ Download: android-launcher-icons.zip
+
+STEP 2: Install Icons
+----------------------
+✓ Extract the ZIP file
+✓ Copy all mipmap-* folders to:
+  android/app/src/main/res/
+
+STEP 3: Build & Install
+------------------------
+✓ Build:
+  npm run build
+  npx cap sync android
+  cd android
+  .\gradlew assembleDebug
+
+✓ Uninstall old app:
+  adb uninstall shri.madhusudan.bapuji
+
+✓ Install new:
+  adb install android\app\build\outputs\apk\debug\app-debug.apk
+
+========================================
+
+KEY POINTS:
+-----------
+• favicon.png = Browser icon (tabs, bookmarks)
+• mipmap icons = Android home screen icon
+• Different files, different purposes!
+• Must uninstall old app before installing new
+
+RESULT:
+-------
+✓ Icon shows on Android home screen
+✓ Icon shows in app drawer
+✓ Icon shows in recent apps
+✓ Professional rounded edges (22.5%)
+
+========================================
+
+FOLDERS TO COPY:
+----------------
+mipmap-mdpi/     (48×48)   → Budget phones
+mipmap-hdpi/     (72×72)   → Standard phones  
+mipmap-xhdpi/    (96×96)   → HD phones
+mipmap-xxhdpi/   (144×144) → Most phones today
+mipmap-xxxhdpi/  (192×192) → High-end phones
+
+All 5 folders → android/app/src/main/res/
+
+========================================
+
+CHECKLIST:
+----------
+[ ] Generated icons with tool
+[ ] Downloaded ZIP file
+[ ] Extracted ZIP
+[ ] Copied mipmap-* folders to res/
+[ ] Ran npm run build
+[ ] Ran npx cap sync android
+[ ] Built APK (gradlew assembleDebug)
+[ ] Uninstalled old app from device
+[ ] Installed new APK
+[ ] Restarted device (if still not showing)
+
+========================================
+
+TOOL OPEN: generate-android-icons.html
+
+Read full guide: ANDROID_ICON_GUIDE.md
+
+========================================

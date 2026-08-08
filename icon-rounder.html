@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Rounder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007AFF;
+        }
+        .preview {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .preview-item {
+            text-align: center;
+        }
+        .preview-item img {
+            border-radius: 22.5%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #666;
+            font-size: 18px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 iOS-Style Icon Rounder</h1>
+        
+        <div class="info">
+            <strong>📋 Instructions:</strong>
+            <ol>
+                <li>Click "Select Image" to choose your favicon.png</li>
+                <li>Preview the rounded version</li>
+                <li>Click "Download Rounded Icon" to save</li>
+                <li>Replace your favicon.png with the downloaded version</li>
+            </ol>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">📁 Select Image</button>
+        <button onclick="downloadRoundedIcon()" id="downloadBtn" disabled>⬇️ Download Rounded Icon</button>
+        
+        <h2>Preview:</h2>
+        <div class="preview">
+            <div class="preview-item">
+                <p><strong>Original</strong></p>
+                <canvas id="originalCanvas" width="512" height="512"></canvas>
+            </div>
+            <div class="preview-item">
+                <p><strong>Rounded (iOS Style)</strong></p>
+                <canvas id="roundedCanvas" width="512" height="512"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let roundedImageData = null;
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    processImage(img);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function processImage(img) {
+            const size = 512;
+            
+            // Draw original
+            const originalCanvas = document.getElementById('originalCanvas');
+            const originalCtx = originalCanvas.getContext('2d');
+            originalCanvas.width = size;
+            originalCanvas.height = size;
+            originalCtx.clearRect(0, 0, size, size);
+            originalCtx.drawImage(img, 0, 0, size, size);
+
+            // Draw rounded version (iOS style - 22.5% radius)
+            const roundedCanvas = document.getElementById('roundedCanvas');
+            const ctx = roundedCanvas.getContext('2d');
+            roundedCanvas.width = size;
+            roundedCanvas.height = size;
+            ctx.clearRect(0, 0, size, size);
+
+            // iOS uses approximately 22.5% border radius (115px for 512px icon)
+            const radius = size * 0.225;
+
+            // Create rounded rectangle path
+            ctx.beginPath();
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.clip();
+
+            // Draw image
+            ctx.drawImage(img, 0, 0, size, size);
+
+            // Optional: Add subtle inner shadow for depth (iOS style)
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2;
+
+            // Store for download
+            roundedImageData = roundedCanvas.toDataURL('image/png');
+            document.getElementById('downloadBtn').disabled = false;
+        }
+
+        function downloadRoundedIcon() {
+            if (!roundedImageData) return;
+
+            const link = document.createElement('a');
+            link.download = 'favicon-rounded.png';
+            link.href = roundedImageData;
+            link.click();
+        }
+    </script>
+</body>
+</html>
